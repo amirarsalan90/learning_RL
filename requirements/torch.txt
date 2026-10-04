@@ -1,0 +1,3 @@
+# Optional autograd backend for lesson 1; install the appropriate PyTorch wheel
+# for your machine using https://pytorch.org/get-started/locally/.
+torch>=2.6,<3
