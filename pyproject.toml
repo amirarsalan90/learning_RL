@@ -1,20 +1,25 @@
 [project]
 name = "learning-rl"
 version = "0.1.0"
-description = "Learn RL for LLMs (REINFORCE, GRPO, PPO, DPO) by implementing it yourself"
+description = "RL for LLMs (REINFORCE, GRPO, PPO, DPO), walked through in runnable, visual notebooks"
 requires-python = ">=3.11"
 dependencies = [
     "torch>=2.5",
     "numpy",
     "matplotlib",
     "ipykernel",
+    "ipywidgets",
+    "transformers>=4.56",
+    "accelerate",
 ]
 
 [dependency-groups]
 # Plain Jupyter Lab, only needed if you use the browser instead of VS Code / Cursor.
 jupyter = ["jupyterlab>=4"]
-# Builds the exercise/solution notebooks from tools/lessons/*.py (course authoring only).
-dev = ["nbformat>=5", "nbclient>=0.10"]
+# Notebook 8: the same algorithms with Hugging Face TRL.
+trl = ["trl>=1.0", "datasets"]
+# Regenerates notebooks/ from tools/lessons/*.py and smoke-tests them (course authoring only).
+dev = ["nbformat>=5", "nbclient>=0.10", "tokenizers"]
 
 [build-system]
 requires = ["hatchling"]

@@ -4,7 +4,7 @@
 
 Why this over a browser Jupyter server: one tool for notebooks, `.py` files, a terminal and git; no tokens or port forwards to juggle; and the editor reconnects on its own when the Mac sleeps.
 
-Stage 1 doesn't need a GPU at all, so you can start it on the Mac (step 5 works locally too) while you set up the PC.
+Notebook 1 doesn't need a GPU at all, so you can start it on the Mac (step 5) while you set up the PC.
 
 ## 1. The PC: Linux with the NVIDIA driver
 
@@ -63,11 +63,11 @@ ssh rtx
 curl -LsSf https://astral.sh/uv/install.sh | sh   # uv manages Python and packages
 git clone https://github.com/amirarsalan90/learning_RL.git
 cd learning_RL
-uv sync
+uv sync --group trl     # --group trl adds the library used in notebook 8
 uv run python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name())"
 ```
 
-The last line should print `True NVIDIA GeForce RTX 4090`. On Linux, the default PyTorch wheels already include CUDA, so nothing else is needed. If it prints `False`, the NVIDIA driver is probably too old for the CUDA version PyTorch was built with: update the driver (on Windows, the Windows driver) and try again.
+The last line should print `True NVIDIA GeForce RTX 4090`. The first LLM notebook downloads Qwen2.5-0.5B-Instruct (about 1 GB) from Hugging Face automatically; no account needed. On Linux, the default PyTorch wheels already include CUDA, so nothing else is needed. If it prints `False`, the NVIDIA driver is probably too old for the CUDA version PyTorch was built with: update the driver (on Windows, the Windows driver) and try again.
 
 ## 4. Connect the editor
 
@@ -79,7 +79,7 @@ The last line should print `True NVIDIA GeForce RTX 4090`. On Linux, the default
 
 Now every cell runs on the PC.
 
-## 5. Running locally on the Mac instead (stage 1 only)
+## 5. Running locally on the Mac instead (notebook 1 only)
 
 ```bash
 git clone https://github.com/amirarsalan90/learning_RL.git && cd learning_RL
@@ -89,24 +89,23 @@ code .   # then open the notebook and pick the .venv kernel
 
 ## Long runs
 
-From stage 4 onward some training runs take tens of minutes. Run those as scripts inside `tmux` on the PC, so they keep going if the Mac sleeps or the connection drops:
+Notebooks 3–6 and 8 train for roughly 15–50 minutes each. The training happens on the PC, but VS Code is what shows you the output, so:
 
-```bash
-ssh rtx
-tmux new -s train        # later: tmux attach -t train
-uv run python ...        # detach with Ctrl-b then d
-```
+- keep the Mac awake while a run is going: run `caffeinate -dims` in a Mac terminal (Ctrl-C to stop);
+- set the PC to never sleep (Windows: Settings → System → Power → Sleep: Never);
+- if you'd rather close the laptop mid-run, use the Jupyter Lab option below inside `tmux`: it keeps running with nobody connected.
 
-Also set the PC to never sleep (Windows: Settings → System → Power → Sleep: Never).
+Every notebook also saves its results to `runs/`, so a finished run's numbers are there even if the live plot was lost.
 
 ## Alternative: a plain Jupyter Lab server
 
 If you'd rather use Jupyter in the browser:
 
 ```bash
-# on the PC, inside tmux
+# on the PC
+tmux new -s jupyter      # later: tmux attach -t jupyter; detach with Ctrl-b then d
 cd ~/learning_RL
-uv sync --group jupyter
+uv sync --group trl --group jupyter   # list every group you want; uv removes the others
 uv run jupyter lab --no-browser --ip 127.0.0.1 --port 8888
 ```
 

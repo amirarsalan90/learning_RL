@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 355" font-family="Helvetica, Arial, sans-serif"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs><rect width="760" height="355" fill="#ffffff"/><text x="20" y="26" text-anchor="start" fill="#333" font-size="13" font-weight="bold">GRPO: the baseline is the group; each batch is used for several clipped updates</text>
+<rect x="20" y="45" width="165" height="76" rx="9" fill="#f3f3f3" stroke="#777" stroke-width="2"/>
+<text x="102.5" y="69.5" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">1 · Sample</text>
+<text x="102.5" y="87.5" text-anchor="middle" fill="#333" font-size="13">a GROUP of 4</text>
+<text x="102.5" y="105.5" text-anchor="middle" fill="#333" font-size="13">per prompt</text>
+<rect x="210" y="45" width="165" height="76" rx="9" fill="#f3f3f3" stroke="#777" stroke-width="2"/>
+<text x="292.5" y="69.5" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">2 · Score</text>
+<text x="292.5" y="87.5" text-anchor="middle" fill="#333" font-size="13">reward 0 or 1</text>
+<text x="292.5" y="105.5" text-anchor="middle" fill="#333" font-size="13">per completion</text>
+<path d="M185,83 L208,83" stroke="#555" stroke-width="2" fill="none" marker-end="url(#a)"/>
+<rect x="400" y="45" width="165" height="76" rx="9" fill="#fdf0e4" stroke="#e07b2a" stroke-width="2"/>
+<text x="482.5" y="69.5" text-anchor="middle" fill="#7a3f0f" font-size="13" font-weight="bold">3 · Advantage</text>
+<text x="482.5" y="87.5" text-anchor="middle" fill="#7a3f0f" font-size="13">A = (r − group mean)</text>
+<text x="482.5" y="105.5" text-anchor="middle" fill="#7a3f0f" font-size="13">/ group std</text>
+<path d="M375,83 L398,83" stroke="#555" stroke-width="2" fill="none" marker-end="url(#a)"/>
+<rect x="590" y="45" width="165" height="76" rx="9" fill="#e6f4ec" stroke="#2e9a5b" stroke-width="2"/>
+<text x="672.5" y="69.5" text-anchor="middle" fill="#1b5e37" font-size="13" font-weight="bold">4 · Update (×2)</text>
+<text x="672.5" y="87.5" text-anchor="middle" fill="#1b5e37" font-size="13">clip(π/π_old) · A</text>
+<text x="672.5" y="105.5" text-anchor="middle" fill="#1b5e37" font-size="13">+ β · KL(π ‖ π_ref)</text>
+<path d="M565,83 L588,83" stroke="#555" stroke-width="2" fill="none" marker-end="url(#a)"/>
+<text x="20" y="160" text-anchor="start" fill="#555" font-size="12" font-weight="bold">One prompt&#x27;s group:</text>
+<rect x="20" y="172" width="260" height="24" rx="9" fill="#e6f4ec" stroke="#2e9a5b" stroke-width="2"/>
+<text x="150.0" y="188.2" text-anchor="middle" fill="#1b5e37" font-size="12">✓ …&lt;answer&gt;109&lt;/answer&gt;</text>
+<text x="295" y="189" text-anchor="start" fill="#555" font-size="12">reward 1</text>
+<text x="370" y="189" text-anchor="start" fill="#1b5e37" font-size="12" font-weight="bold">advantage +0.87</text>
+<rect x="20" y="200" width="260" height="24" rx="9" fill="#fbe7e7" stroke="#c94040" stroke-width="2"/>
+<text x="150.0" y="216.2" text-anchor="middle" fill="#7a1f1f" font-size="12">✗ …&lt;answer&gt;99&lt;/answer&gt;</text>
+<text x="295" y="217" text-anchor="start" fill="#555" font-size="12">reward 0</text>
+<text x="370" y="217" text-anchor="start" fill="#7a1f1f" font-size="12" font-weight="bold">advantage −0.87</text>
+<rect x="20" y="228" width="260" height="24" rx="9" fill="#fbe7e7" stroke="#c94040" stroke-width="2"/>
+<text x="150.0" y="244.2" text-anchor="middle" fill="#7a1f1f" font-size="12">✗ …(no answer tag)</text>
+<text x="295" y="245" text-anchor="start" fill="#555" font-size="12">reward 0</text>
+<text x="370" y="245" text-anchor="start" fill="#7a1f1f" font-size="12" font-weight="bold">advantage −0.87</text>
+<rect x="20" y="256" width="260" height="24" rx="9" fill="#e6f4ec" stroke="#2e9a5b" stroke-width="2"/>
+<text x="150.0" y="272.2" text-anchor="middle" fill="#1b5e37" font-size="12">✓ …&lt;answer&gt;109&lt;/answer&gt;</text>
+<text x="295" y="273" text-anchor="start" fill="#555" font-size="12">reward 1</text>
+<text x="370" y="273" text-anchor="start" fill="#1b5e37" font-size="12" font-weight="bold">advantage +0.87</text>
+<text x="480" y="190" text-anchor="start" fill="#777" font-size="12">mean 0.5, std 0.58:</text>
+<text x="480" y="208" text-anchor="start" fill="#777" font-size="12">right answers pushed up,</text>
+<text x="480" y="226" text-anchor="start" fill="#777" font-size="12">wrong ones pushed down.</text>
+<text x="480" y="250" text-anchor="start" fill="#777" font-size="12">All 4 right (or all wrong)?</text>
+<text x="480" y="268" text-anchor="start" fill="#777" font-size="12">Every A = 0: nothing learned.</text>
+<text x="20" y="317" text-anchor="start" fill="#555" font-size="12" font-weight="bold">Models in GPU memory</text>
+<rect x="20" y="325" width="25" height="24" rx="5" fill="#e8f0fb" stroke="#2f6db5" stroke-width="1.5"/>
+<text x="32.5" y="342" text-anchor="middle" fill="#1d3f6e" font-size="13" font-weight="bold">π</text>
+<text x="53" y="342" text-anchor="start" fill="#555" font-size="12">policy (trained)</text>
+<rect x="175.0" y="325" width="61" height="24" rx="5" fill="#e8f0fb" stroke="#2f6db5" stroke-width="1.5"/>
+<text x="205.5" y="342" text-anchor="middle" fill="#1d3f6e" font-size="13" font-weight="bold">π_old</text>
+<text x="244.0" y="342" text-anchor="start" fill="#555" font-size="12">π when it sampled (just saved log-probs)</text>
+<rect x="522.0" y="325" width="61" height="24" rx="5" fill="#f3f3f3" stroke="#777" stroke-width="1.5"/>
+<text x="552.5" y="342" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">π_ref</text>
+<text x="591.0" y="342" text-anchor="start" fill="#555" font-size="12">frozen start</text></svg>

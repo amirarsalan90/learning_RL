@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 230" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+  <rect width="760" height="230" fill="#ffffff"/>
+  <text x="20" y="28" font-weight="bold" fill="#333">One action = a whole completion, made of many token choices</text>
+  <rect x="20" y="50" width="250" height="40" rx="6" fill="#eeeeee" stroke="#999"/>
+  <text x="145" y="75" text-anchor="middle" fill="#444">prompt: "What is 23 * 4 + 17?"</text>
+  <g font-family="Menlo, Consolas, monospace" font-size="13">
+    <rect x="285" y="50" width="70" height="40" rx="6" fill="#e8f0fb" stroke="#2f6db5"/><text x="320" y="75" text-anchor="middle" fill="#1d3f6e">23*4</text>
+    <rect x="362" y="50" width="70" height="40" rx="6" fill="#e8f0fb" stroke="#2f6db5"/><text x="397" y="75" text-anchor="middle" fill="#1d3f6e">=92</text>
+    <rect x="439" y="50" width="70" height="40" rx="6" fill="#e8f0fb" stroke="#2f6db5"/><text x="474" y="75" text-anchor="middle" fill="#1d3f6e">+17</text>
+    <rect x="516" y="50" width="120" height="40" rx="6" fill="#e8f0fb" stroke="#2f6db5"/><text x="576" y="75" text-anchor="middle" fill="#1d3f6e">&lt;answer&gt;109</text>
+    <rect x="643" y="50" width="97" height="40" rx="6" fill="#e8f0fb" stroke="#2f6db5"/><text x="691" y="75" text-anchor="middle" fill="#1d3f6e">&lt;|end|&gt;</text>
+  </g>
+  <g fill="#2f6db5" font-size="12" text-anchor="middle">
+    <text x="320" y="110">log π(t₁)</text><text x="397" y="110">log π(t₂)</text><text x="474" y="110">log π(t₃)</text><text x="576" y="110">log π(t₄)</text><text x="691" y="110">log π(t₅)</text>
+  </g>
+  <path d="M290,122 Q510,150 735,122" stroke="#2f6db5" stroke-width="1.5" fill="none"/>
+  <text x="510" y="160" text-anchor="middle" fill="#1d3f6e">log π(completion | prompt) = sum of the token log-probs</text>
+  <path d="M510,170 L510,190" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="380" y="193" width="260" height="30" rx="6" fill="#e6f4ec" stroke="#2e9a5b"/>
+  <text x="510" y="213" text-anchor="middle" fill="#1b5e37">reward = 1 (109 is correct)</text>
+  <text x="20" y="140" fill="#777" font-size="12">The prompt is given,</text>
+  <text x="20" y="156" fill="#777" font-size="12">so its tokens get no gradient:</text>
+  <text x="20" y="172" fill="#777" font-size="12">only completion tokens are masked in.</text>
+</svg>
