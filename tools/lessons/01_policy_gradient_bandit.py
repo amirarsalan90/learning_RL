@@ -61,10 +61,20 @@ def expected_reward(logits):
     return (torch.softmax(logits, dim=-1) * TRUE_P).sum()
 
 
-plt.figure(figsize=(5, 2.3))
-plt.bar(range(N_ARMS), TRUE_P, color=viz.PALETTE["gray"])
-plt.xticks(range(N_ARMS), [f"arm {i}" for i in range(N_ARMS)])
-plt.ylabel("P(reward = 1)"), plt.title("The hidden payout of each arm"), plt.show()
+start_policy = torch.softmax(torch.zeros(N_ARMS), -1)
+fig, axes = plt.subplots(1, 2, figsize=(11, 2.6))
+axes[0].bar(range(N_ARMS), start_policy, color=viz.PALETTE["blue"])
+axes[0].set_title(f"The policy π(arm): which arm to pull\n(a softmax, sums to {start_policy.sum():.0f})")
+axes[1].bar(range(N_ARMS), TRUE_P, color=viz.PALETTE["gray"])
+axes[1].set_title(f"The environment p_a: chance each arm pays 1\n(5 separate coins, sum {TRUE_P.sum():.1f}: no need to be 1)")
+for ax in axes:
+    ax.set_xticks(range(N_ARMS)), ax.set_xticklabels([f"arm {i}" for i in range(N_ARMS)]), ax.set_ylim(0, 1)
+fig.tight_layout(), plt.show()
+"""),
+    md(r"""
+**Two different sets of numbers, don't mix them up.** The softmax belongs to the *policy* (left): it's a probability distribution over *which arm to pull*, so it sums to 1. `TRUE_P` belongs to the *environment* (right): each arm is its own independent coin, and `TRUE_P[a]` is that coin's chance of paying 1. Nothing forces those to sum to 1, just like five different slot machines can each pay out 80% of the time.
+
+For an LLM it's the same split: the model's softmax decides *which completion to write*; whether that completion is correct is a separate fact about the world, checked by the reward function.
 """),
     md(r"""
 ## The gradient we want, and why we can't just compute it
