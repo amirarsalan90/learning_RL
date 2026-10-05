@@ -28,6 +28,84 @@ from rlcourse import viz
 viz.figure("rl_loop.svg")
 """),
     md(r"""
+## Reading the loop: one update, by hand
+
+Forget bandits and math for a moment. Say a model answers **"What is 7 × 8?"** and, to keep it tiny, it can only say one of three things: `54`, `56` or `63`. Its current habits (the **policy** π) are:
+
+| answer | 54 | 56 | 63 |
+|---|---|---|---|
+| π(answer) | 0.30 | 0.40 | 0.30 |
+
+Now walk around the loop once:
+
+1. **Sample.** Ask it 4 times. It says `56`, `54`, `56`, `63`.
+2. **Score.** The **reward** is just a grade from a checker: 1 if right, 0 if wrong. Rewards: `1, 0, 1, 0`. Nothing more: a number per answer, computed by plain code, that we can't differentiate through.
+3. **Advantage.** "Was this answer *better or worse than usual*?" The **baseline** is what we expected on average (here, the batch's mean reward, 0.5), and the **advantage** is A = reward − baseline: `+0.5, −0.5, +0.5, −0.5`. Positive means "better than typical, do more of this", negative means "worse than typical, do less".
+4. **Update.** Change π so that answers with positive A become more likely and answers with negative A less likely, each in proportion to |A|. The loss **−A · log π(answer)** is just the shortest way to tell PyTorch exactly that (details below the plot).
+
+Run the cell to see that single update happen:
+"""),
+    code(r"""
+answers = ["54", "56", "63"]
+logits = torch.log(torch.tensor([0.30, 0.40, 0.30])).requires_grad_(True)  # the policy's parameters
+sampled = torch.tensor([1, 0, 1, 2])  # indices into answers: 56, 54, 56, 63
+rewards = torch.tensor([1.0, 0.0, 1.0, 0.0])  # 1 = correct
+
+
+def one_step(weights, lr=1.0):
+    # One gradient step on loss = -mean(weight * log π(sampled answer)). Returns the new π.
+    l = logits.detach().clone().requires_grad_(True)
+    log_pi = torch.log_softmax(l, -1)[sampled]
+    loss = -(weights * log_pi).mean()
+    loss.backward()
+    with torch.no_grad():
+        return torch.softmax(l - lr * l.grad, -1)
+
+
+baseline = rewards.mean()
+advantages = rewards - baseline
+print("sampled   :", [answers[i] for i in sampled])
+print("reward    :", rewards.tolist())
+print(f"baseline  : {baseline:.2f}  (mean reward)")
+print("advantage :", advantages.tolist())
+
+before = torch.softmax(logits, -1).detach()
+after = one_step(advantages)
+
+fig, ax = plt.subplots(figsize=(7, 3))
+x = np.arange(3)
+ax.bar(x - 0.2, before, 0.4, color=viz.PALETTE["gray"], label="before the update")
+ax.bar(x + 0.2, after, 0.4, color=viz.PALETTE["green"], label="after one update")
+for xi, (b, a) in enumerate(zip(before, after)):
+    ax.text(xi - 0.2, b + 0.01, f"{b:.2f}", ha="center", fontsize=9)
+    ax.text(xi + 0.2, a + 0.01, f"{a:.2f}", ha="center", fontsize=9)
+ax.set_xticks(x), ax.set_xticklabels([f'"{a}"' + ("  ✓ correct" if a == "56" else "  ✗") for a in answers])
+ax.set_ylabel("π(answer)"), ax.set_ylim(0, 0.7), ax.legend(loc="upper left", fontsize=9)
+ax.set_title("One update on the batch [56, 54, 56, 63]  (A = +0.5, −0.5, +0.5, −0.5)")
+plt.show()
+"""),
+    md(r"""
+**What the plot shows:** after one update the correct answer `56` went from 0.40 to about 0.49, and both wrong answers became less likely. Repeat this loop many times and π piles up on `56`. That's all "learning" means here.
+
+(Why bother with the baseline, rather than weighting by the raw reward? In this tiny batch it barely matters. It matters a lot when rewards are noisy or all positive; the "Baselines" section further down shows a case where skipping it makes training lock onto the wrong answer.)
+
+### Why the loss is −A · log π
+
+Read it in pieces:
+
+- **log π(answer)** is the model's log-probability of the answer it actually gave. Its gradient points in the direction that makes *that answer* more likely (for a softmax: raise its logit, lower the others).
+- **× A** scales and signs that direction. A > 0: move toward making it more likely. A < 0: move the other way. A = 0: don't move.
+- **The minus sign** is only because optimizers *minimize*. Minimizing −A · log π is the same as maximizing A · log π.
+- **Averaged over the batch**, these pushes add up to the direction that increases the *average reward*. Section "The trick" below shows why that's exactly true, not just a heuristic.
+
+Two things that often confuse people:
+
+- **The loss is not a measure of quality.** Its value can go up while the model gets better. It exists only so that `.backward()` produces the right gradient. To see progress, look at the reward.
+- **Why log π and not π?** The gradient of log π is ∇π / π: the push is divided by how likely the answer already was. That cancels out the fact that likely answers show up in the batch more often, so each answer's total push ends up proportional to how *good* it is, not how *frequent* it is.
+
+That's the entire core of REINFORCE, GRPO and PPO: **sample, score, compare to a baseline, push probabilities up or down by the advantage.** Everything else in this course is about doing that with less noise, with less waste, or more safely. The rest of this notebook checks each step carefully on a slightly bigger example.
+"""),
+    md(r"""
 ## A bandit: RL with everything else stripped away
 
 | RL for LLMs | This notebook |
