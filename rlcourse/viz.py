@@ -7,7 +7,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
-from IPython.display import HTML, Code, display
+from IPython.display import HTML, display
 
 PALETTE = {"blue": "#2f6db5", "orange": "#e07b2a", "green": "#2e9a5b", "red": "#c94040",
            "purple": "#7a4fb5", "gray": "#7a7a7a"}
@@ -21,10 +21,21 @@ plt.rcParams.update({"figure.dpi": 110, "axes.spines.top": False, "axes.spines.r
 # ----------------------------------------------------------------------------- code
 
 def show_code(obj, title=None):
-    """Show the source of a function/class/module with syntax highlighting."""
-    if title:
-        display(HTML(f"<b>{html.escape(title)}</b>"))
-    display(Code(inspect.getsource(obj), language="python"))
+    """Show the source of a function/class/module with syntax highlighting.
+
+    Colors are inlined on every token and the block sets its own background and text
+    color, so it reads the same in light and dark editor themes."""
+    from pygments import highlight
+    from pygments.formatters import HtmlFormatter
+    from pygments.lexers import PythonLexer
+
+    src = obj if isinstance(obj, str) else inspect.getsource(obj)
+    body = highlight(src, PythonLexer(), HtmlFormatter(noclasses=True, style="default", nobackground=True))
+    body = body.replace('<pre style="', '<pre style="color:#1f1f1f;background:transparent;margin:0;')
+    head = f"<div style='font-family:sans-serif;margin:4px 0'><b>{html.escape(title)}</b></div>" if title else ""
+    display(HTML(f"{head}<div style='background:#f7f7f7;color:#1f1f1f;border:1px solid #ddd;border-radius:4px;"
+                 f"padding:6px 10px;overflow-x:auto;font-family:Menlo,Consolas,monospace;font-size:12.5px'>"
+                 f"{body}</div>"))
 
 
 def show_diff(a, b, label_a=None, label_b=None, context=3):
@@ -53,10 +64,10 @@ def show_diff(a, b, label_a=None, label_b=None, context=3):
                 bg_l = bg_l if k < len(left) else ("#f4f4f4" if tag != "equal" else "")
                 bg_r = bg_r if k < len(right) else ("#f4f4f4" if tag != "equal" else "")
                 rows.append(
-                    f'<tr><td style="color:#999;text-align:right;padding:0 6px">{l_no}</td>'
-                    f'<td style="background:{bg_l};white-space:pre-wrap;word-break:break-all;padding:0 8px">{l_txt}</td>'
+                    f'<tr><td style="color:#888;text-align:right;padding:0 6px">{l_no}</td>'
+                    f'<td style="background:{bg_l};color:#1f1f1f;white-space:pre-wrap;overflow-wrap:anywhere;padding:0 8px">{l_txt}</td>'
                     f'<td style="color:#999;text-align:right;padding:0 6px;border-left:1px solid #ddd">{r_no}</td>'
-                    f'<td style="background:{bg_r};white-space:pre-wrap;word-break:break-all;padding:0 8px">{r_txt}</td></tr>'
+                    f'<td style="background:{bg_r};color:#1f1f1f;white-space:pre-wrap;overflow-wrap:anywhere;padding:0 8px">{r_txt}</td></tr>'
                 )
     header = (f'<div style="font-family:sans-serif;margin:4px 0"><b>{html.escape(label_a)}</b> → '
               f'<b>{html.escape(label_b)}</b>: <span style="color:#2e9a5b">+{added}</span> / '
@@ -64,8 +75,8 @@ def show_diff(a, b, label_a=None, label_b=None, context=3):
     table = ('<div style="overflow-x:auto;background:#fff;color:#222;border:1px solid #ddd;border-radius:4px">'
              '<table style="border-collapse:collapse;table-layout:fixed;font-family:Menlo,Consolas,monospace;font-size:11.5px;width:100%">'
              '<colgroup><col style="width:3em"><col style="width:calc(50% - 3em)"><col style="width:3em"><col style="width:calc(50% - 3em)"></colgroup>'
-             f'<tr style="background:#f6f8fa"><th></th><th style="text-align:left;padding:2px 8px">{html.escape(label_a)}</th>'
-             f'<th></th><th style="text-align:left;padding:2px 8px">{html.escape(label_b)}</th></tr>'
+             f'<tr style="background:#f6f8fa"><th></th><th style="color:#1f1f1f;text-align:left;padding:2px 8px">{html.escape(label_a)}</th>'
+             f'<th></th><th style="color:#1f1f1f;text-align:left;padding:2px 8px">{html.escape(label_b)}</th></tr>'
              + "".join(rows) + "</table></div>")
     display(HTML(header + table))
 
