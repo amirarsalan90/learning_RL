@@ -15,6 +15,8 @@ CELLS = [
 
 **Run-only. Needs the GPU; training takes roughly 20–40 minutes.**
 
+![GRPO, animated](figures/grpo.gif)
+
 GRPO (from DeepSeekMath, and the algorithm behind DeepSeek-R1) is REINFORCE with two changes:
 
 1. **The baseline is the group.** Sample several completions for the same prompt; each one's advantage is how it did *relative to its siblings*. No running average, no critic.

@@ -15,6 +15,8 @@ CELLS = [
 
 **Run-only. Needs the GPU; training takes roughly 15–30 minutes.**
 
+![REINFORCE, animated](figures/reinforce.gif)
+
 This is notebook 1's algorithm, unchanged in spirit, applied to Qwen:
 """),
     code(r"""

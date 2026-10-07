@@ -15,6 +15,8 @@ CELLS = [
 
 **Run-only. Needs the GPU; training takes roughly 30–50 minutes.**
 
+![PPO, animated](figures/ppo.gif)
+
 PPO is the algorithm behind the original ChatGPT RLHF. It shares GRPO's clipped update, but replaces the group baseline with a **critic**: a second network that reads the completion as it's being written and predicts, at every token, the reward it expects at the end. That buys two things and costs one:
 
 - ✅ **per-token credit**: tokens where the critic's prediction jumps up or down get the credit or blame, instead of every token sharing one number;

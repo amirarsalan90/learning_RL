@@ -1,24 +1,16 @@
 """GRPO in one picture: score each answer against the other answers to the same prompt.
 
-Render (needs `pip install manim`, no LaTeX):
-    manim -r 960,540 --fps 15 tools/animations/grpo.py GRPO
-then convert to a GIF with tools/animations/to_gif.sh.
+Render: tools/animations/render.sh grpo
 """
+
+import sys
+from pathlib import Path
 
 from manim import *
 
-BG = "#161b22"
-FG = "#e6edf3"
-DIM = "#8b949e"
-GOOD = "#3fb950"
-BAD = "#f85149"
-ACCENT = "#e3a33b"  # the group / baseline colour (orange, as in the notebook diagrams)
-BLUE = "#58a6ff"
+sys.path.insert(0, str(Path(__file__).parent))
+from common import *  # noqa: E402
 
-SANS = "Inter"
-MONO = "DejaVu Sans Mono"
-
-QUESTION = "What is 47 * 6 + 35?"
 # (reasoning, answer, reward). Rewards 1,0,0,0 give mean 0.25, std 0.5, advantages +1.5 / -0.5.
 COMPLETIONS = [
     ("47*6 = 282, 282+35 = 317", "317", 1),
@@ -27,10 +19,6 @@ COMPLETIONS = [
     ("47*6 = 282, 282+35 = 307", "307", 0),
 ]
 ADV = [1.5, -0.5, -0.5, -0.5]
-
-
-def T(s, size=24, color=FG, font=SANS, weight=NORMAL):
-    return Text(s, font=font, font_size=size, color=color, weight=weight)
 
 
 class GRPO(Scene):
@@ -55,13 +43,7 @@ class GRPO(Scene):
         self.play(FadeIn(title), FadeIn(prompt), run_time=0.8)
         rows = VGroup()
         for (reason, ans, _), y in zip(COMPLETIONS, ys):
-            box = RoundedRectangle(corner_radius=0.12, width=6.6, height=0.72,
-                                   stroke_color=DIM, stroke_width=1.5, fill_color="#21262d", fill_opacity=1)
-            txt = T(reason, 17, font=MONO)
-            tag = T(f"<answer>{ans}</answer>", 17, BLUE, font=MONO)
-            line = VGroup(txt, tag).arrange(RIGHT, buff=0.2)
-            line.scale_to_fit_width(min(line.width, box.width - 0.4)).move_to(box)
-            rows.add(VGroup(box, txt, tag).move_to([x_ans, y, 0]))
+            rows.add(answer_box(reason, ans).move_to([x_ans, y, 0]))
         self.play(FadeIn(heads[0]), LaggedStart(*[FadeIn(r, shift=0.3 * RIGHT) for r in rows], lag_ratio=0.25),
                   run_time=1.6)
         self.wait(0.4)

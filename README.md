@@ -17,6 +17,16 @@ REINFORCE → GRPO → PPO → DPO are each implemented in ~100 readable lines o
 
 GPU times are rough estimates for one 24 GB card such as an RTX 4090.
 
+## The four algorithms, animated
+
+Each notebook opens with one of these. Same prompt, same task, one idea per algorithm.
+
+| REINFORCE: reward minus a running baseline | GRPO: grade each answer against its own group |
+|---|---|
+| ![REINFORCE](notebooks/figures/reinforce.gif) | ![GRPO](notebooks/figures/grpo.gif) |
+| **PPO: a critic gives every token its own credit** | **DPO: prefer the chosen answer over the rejected one** |
+| ![PPO](notebooks/figures/ppo.gif) | ![DPO](notebooks/figures/dpo.gif) |
+
 ## What you need
 
 - **To read along:** nothing. The notebooks render on GitHub.
@@ -46,7 +56,7 @@ rlcourse/
   viz.py         plots, token heatmaps, code diffs
 notebooks/       the walkthroughs (+ figures/)
 runs/            results each notebook saves (created when you run them)
-tools/           generates the notebooks and diagrams
+tools/           generates the notebooks, diagrams and animations
 ```
 
 ## Further reading

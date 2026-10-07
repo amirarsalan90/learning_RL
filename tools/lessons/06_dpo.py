@@ -15,6 +15,8 @@ CELLS = [
 
 **Run-only. Needs the GPU; about 10–20 minutes (most of it building the dataset).**
 
+![DPO, animated](figures/dpo.gif)
+
 Everything so far was **online**: sample from the current model, score, update, repeat. DPO is **offline**: you start from a fixed dataset of pairs (prompt, a better reply, a worse reply) and train on it like supervised learning. No reward function inside the loop, no critic, no generation during training.
 
 That's why DPO became the default for preference tuning (where the data is human "I prefer A over B" labels): it's simple and stable. The price: it can only learn from replies already in the dataset.
