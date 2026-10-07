@@ -345,3 +345,10 @@ What the real algorithms add on top:
 - **No sampling at all**: learning from fixed preference pairs (DPO notebook).
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- R. J. Williams (1992), [Simple statistical gradient-following algorithms for connectionist reinforcement learning](https://link.springer.com/article/10.1007/BF00992696): the original REINFORCE paper.
+- R. S. Sutton & A. G. Barto, [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/the-book-2nd.html), chapter 13 (policy gradient methods). Free online.
+"""))

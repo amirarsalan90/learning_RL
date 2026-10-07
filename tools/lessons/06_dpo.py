@@ -140,3 +140,9 @@ plt.ylabel("held-out accuracy (greedy)"), plt.ylim(0, 1), plt.show()
 - Common in practice: DPO for preference/style data (human labels), GRPO-style online RL for tasks with a checkable reward.
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- R. Rafailov et al. (2023), [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290): DPO and its derivation.
+"""))

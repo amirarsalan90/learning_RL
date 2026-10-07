@@ -169,3 +169,12 @@ plt.ylabel("held-out accuracy (greedy)"), plt.ylim(0, 1), plt.show()
 - Still one advantage per completion, shared by all its tokens. PPO's critic changes that next.
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- Z. Shao et al. (2024), [DeepSeekMath](https://arxiv.org/abs/2402.03300): introduces GRPO.
+- DeepSeek-AI (2025), [DeepSeek-R1](https://arxiv.org/abs/2501.12948): GRPO with verifiable rewards at scale.
+- Z. Liu et al. (2025), [Understanding R1-Zero-Like Training: A Critical Perspective](https://arxiv.org/abs/2503.20783) (Dr. GRPO): the length and std-normalization biases.
+- Q. Yu et al. (2025), [DAPO](https://arxiv.org/abs/2503.14476): token-level loss averaging, dynamic sampling of zero-variance groups.
+"""))

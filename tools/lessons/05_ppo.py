@@ -179,3 +179,11 @@ fig.tight_layout(), plt.show()
 - That cost, for tasks where the reward only arrives at the end anyway, is why GRPO became popular for reasoning models.
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- J. Schulman et al. (2017), [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347): PPO.
+- J. Schulman et al. (2015), [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438): GAE.
+- L. Ouyang et al. (2022), [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155) (InstructGPT): PPO for RLHF, with the KL penalty in the reward.
+"""))

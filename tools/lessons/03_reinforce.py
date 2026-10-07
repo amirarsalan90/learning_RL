@@ -154,3 +154,11 @@ plt.ylabel("held-out accuracy (greedy)"), plt.ylim(0, 1), plt.show()
 - If reward rises but the KL explodes or completions get weird, the policy is drifting: raise `kl_coef` or lower `lr`.
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- R. J. Williams (1992), [Simple statistical gradient-following algorithms for connectionist reinforcement learning](https://link.springer.com/article/10.1007/BF00992696): REINFORCE.
+- A. Ahmadian et al. (2024), [Back to Basics: Revisiting REINFORCE Style Optimization for Learning from Human Feedback in LLMs](https://arxiv.org/abs/2402.14740): REINFORCE and RLOO for LLMs.
+- J. Schulman, [Approximating KL Divergence](http://joschu.net/blog/kl-approx.html): where the `exp(d) - d - 1` KL estimator comes from.
+"""))

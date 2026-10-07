@@ -19,7 +19,7 @@ CELLS = [
 2. the task and the reward function;
 3. how good the starting model is, which decides how much there is to learn.
 
-The model is `Qwen2.5-0.5B-Instruct`: small enough to fully fine-tune on one 4090, big enough to do some arithmetic.
+The model is `Qwen2.5-0.5B-Instruct`: small enough to fully fine-tune on a single 24 GB GPU such as an RTX 4090, big enough to do some arithmetic.
 """),
     code(r"""
 import torch
@@ -137,7 +137,7 @@ axes[0].set_ylabel("number of prompts")
 fig.suptitle("Red bars: all right or all wrong, so zero learning signal for GRPO"), fig.tight_layout(), plt.show()
 """),
     md(r"""
-**Pick the difficulty where most prompts are green**: the model is right sometimes but not always. The training notebooks default to `"medium"`. If on your machine `medium` is mostly red at 0 (too hard), switch the configs to `"easy"`; if mostly red at 8, use `"hard"`.
+**Pick the difficulty where most prompts are green**: the model is right sometimes but not always. The training notebooks default to `"medium"`. If `medium` is mostly red at 0 (too hard), switch the configs to `"easy"`; if mostly red at 8, use `"hard"`.
 
 ## Baseline: greedy accuracy on the held-out set
 

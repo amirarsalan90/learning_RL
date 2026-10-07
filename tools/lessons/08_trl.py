@@ -197,6 +197,12 @@ print(f"TRL DPO held-out accuracy: {results['accuracy']:.1%}" + (f"   (ours: {ou
 - Defaults matter and differ: TRL's GRPO uses `beta = 0` (no reference model, no KL) and the `"dapo"` token averaging. Different papers and libraries make different choices for these, and they change results.
 - Small differences between our runs and TRL's are expected (random seeds, numerics, details like how truncated completions are handled). Large ones mean a setting doesn't match.
 
-**Where to go from here**: try `difficulty="hard"`, a bigger model (`Qwen/Qwen2.5-1.5B-Instruct` fits on a 4090 with LoRA via `peft`), or a different reward, like a formatting bonus, and watch for reward hacking.
+**Where to go from here**: try `difficulty="hard"`, a bigger model (`Qwen/Qwen2.5-1.5B-Instruct` fits on a 24 GB GPU with LoRA via `peft`), or a different reward, like a formatting bonus, and watch for reward hacking.
 """),
 ]
+
+CELLS.append(md(r"""
+## Further reading
+
+- [TRL documentation](https://huggingface.co/docs/trl): GRPOTrainer and DPOTrainer, with every config option explained.
+"""))

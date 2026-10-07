@@ -1,117 +1,67 @@
-# Setup: code on the Mac, run on the 4090
+# Setup
 
-**Recommendation:** use VS Code (or Cursor) with the **Remote - SSH** extension to connect from the Mac to the PC over Tailscale. The editor window is on your Mac; the files, the Python environment, the notebook kernel and the GPU are all on the PC. You open `.ipynb` files in the editor as usual, and every cell runs on the 4090.
+## What you need
 
-Why this over a browser Jupyter server: one tool for notebooks, `.py` files, a terminal and git; no tokens or port forwards to juggle; and the editor reconnects on its own when the Mac sleeps.
+- **To read:** nothing. Open the notebooks on GitHub; any notebook saved with its outputs shows every plot and sample.
+- **To run notebook 1:** any computer with Python. It runs on a CPU in under a minute.
+- **To run notebooks 2–8:** Linux (or Windows with WSL2) and an NVIDIA GPU with about **24 GB** of memory, such as an RTX 3090, 4090 or A5000. The model is small (0.5B parameters), but every notebook fully fine-tunes it and keeps a frozen copy, and PPO adds a second trainable model.
 
-Notebook 1 doesn't need a GPU at all, so you can start it on the Mac (step 5) while you set up the PC.
+## Install
 
-## 1. The PC: Linux with the NVIDIA driver
-
-**If the PC runs Linux:** install the NVIDIA driver from your distro's packages and check that `nvidia-smi` lists the RTX 4090. That's it; skip to step 2.
-
-**If it runs Windows:** use WSL2 (Ubuntu). It's a real Linux userland with GPU access, and every RL/LLM tool assumes Linux.
-
-1. Install the latest NVIDIA *Windows* driver (the normal Game Ready or Studio driver). Do **not** install a Linux driver inside WSL.
-2. In an admin PowerShell: `wsl --install -d Ubuntu-24.04`, reboot, and create your Linux user.
-3. In Ubuntu, enable systemd so services (SSH, Tailscale) start on their own:
-   ```bash
-   printf '[boot]\nsystemd=true\n' | sudo tee /etc/wsl.conf
-   ```
-   then `wsl --shutdown` in PowerShell and reopen Ubuntu.
-4. Check: `nvidia-smi` inside Ubuntu lists the 4090.
-
-## 2. Make the PC reachable over Tailscale with SSH
-
-On the Linux side (inside WSL if Windows):
+The project uses [uv](https://docs.astral.sh/uv/) to manage Python and packages. Install it once:
 
 ```bash
-# Tailscale. On Windows this makes WSL its own device on your tailnet, which is
-# what lets the Mac SSH straight into Linux without any port forwarding.
-curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up --hostname rtx-pc
-
-# SSH server
-sudo apt update && sudo apt install -y openssh-server
-sudo systemctl enable --now ssh
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-On the Mac:
+Then:
 
 ```bash
-ssh-keygen -t ed25519            # skip if ~/.ssh/id_ed25519 already exists
-ssh-copy-id YOUR_LINUX_USER@rtx-pc
-```
-
-Add this to `~/.ssh/config` on the Mac:
-
-```
-Host rtx
-    HostName rtx-pc
-    User YOUR_LINUX_USER
-    ServerAliveInterval 30
-```
-
-Check: `ssh rtx nvidia-smi` from the Mac prints the 4090's status.
-
-`rtx-pc` resolves through Tailscale's MagicDNS (on by default). If it doesn't, use the PC's `100.x.y.z` address from `tailscale ip -4`.
-
-## 3. The project on the PC
-
-```bash
-ssh rtx
-curl -LsSf https://astral.sh/uv/install.sh | sh   # uv manages Python and packages
 git clone https://github.com/amirarsalan90/learning_RL.git
 cd learning_RL
-uv sync --group trl     # --group trl adds the library used in notebook 8
+uv sync --group trl     # --group trl adds Hugging Face TRL, used only in notebook 8
+```
+
+Check that PyTorch sees the GPU:
+
+```bash
 uv run python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name())"
 ```
 
-The last line should print `True NVIDIA GeForce RTX 4090`. The first LLM notebook downloads Qwen2.5-0.5B-Instruct (about 1 GB) from Hugging Face automatically; no account needed. On Linux, the default PyTorch wheels already include CUDA, so nothing else is needed. If it prints `False`, the NVIDIA driver is probably too old for the CUDA version PyTorch was built with: update the driver (on Windows, the Windows driver) and try again.
+It should print `True` and your GPU's name. If it prints `False`, the NVIDIA driver is usually too old for the CUDA version PyTorch was built with: update the driver and try again. On Linux, the default PyTorch wheels already include CUDA.
 
-## 4. Connect the editor
+The first LLM notebook downloads `Qwen/Qwen2.5-0.5B-Instruct` (about 1 GB) from Hugging Face automatically. No account is needed.
 
-1. In VS Code on the Mac, install the **Remote - SSH**, **Python** and **Jupyter** extensions. (Cursor: the same, from its extension panel.)
-2. `Cmd+Shift+P` → **Remote-SSH: Connect to Host…** → `rtx`.
-3. **File → Open Folder** → `~/learning_RL`.
-4. In the remote window, install the **Python** and **Jupyter** extensions again when it offers (they need to exist on the remote side).
-5. Open `notebooks/01_policy_gradient_bandit.ipynb`, click **Select Kernel** (top right) → **Python Environments** → `.venv`.
+## Open the notebooks
 
-Now every cell runs on the PC.
+Any Jupyter front end works, as long as it uses the project's `.venv` environment:
 
-## 5. Running locally on the Mac instead (notebook 1 only)
+- **VS Code or Cursor:** open the folder, open a notebook, click **Select Kernel** → **Python Environments** → `.venv`. This also works on a remote GPU machine through the Remote - SSH extension.
+- **Jupyter Lab in the browser:**
+  ```bash
+  uv sync --group trl --group jupyter   # uv keeps only the groups you list
+  uv run jupyter lab
+  ```
 
-```bash
-git clone https://github.com/amirarsalan90/learning_RL.git && cd learning_RL
-uv sync
-code .   # then open the notebook and pick the .venv kernel
-```
+Then run the cells from top to bottom.
+
+## Windows
+
+Use WSL2: install the normal NVIDIA Windows driver (not a Linux driver inside WSL), run `wsl --install -d Ubuntu-24.04`, and follow the Linux steps inside Ubuntu. `nvidia-smi` inside Ubuntu should list your GPU.
 
 ## Long runs
 
-Notebooks 3–6 and 8 train for roughly 15–50 minutes each. The training happens on the PC, but VS Code is what shows you the output, so:
-
-- keep the Mac awake while a run is going: run `caffeinate -dims` in a Mac terminal (Ctrl-C to stop);
-- set the PC to never sleep (Windows: Settings → System → Power → Sleep: Never);
-- if you'd rather close the laptop mid-run, use the Jupyter Lab option below inside `tmux`: it keeps running with nobody connected.
-
-Every notebook also saves its results to `runs/`, so a finished run's numbers are there even if the live plot was lost.
-
-## Alternative: a plain Jupyter Lab server
-
-If you'd rather use Jupyter in the browser:
+Notebooks 3–6 and 8 train for roughly 15–50 minutes each. If you work on a remote machine and your laptop might sleep or disconnect, run Jupyter Lab inside `tmux` on the GPU machine so the kernel keeps going with nobody connected:
 
 ```bash
-# on the PC
-tmux new -s jupyter      # later: tmux attach -t jupyter; detach with Ctrl-b then d
-cd ~/learning_RL
-uv sync --group trl --group jupyter   # list every group you want; uv removes the others
+tmux new -s jupyter          # later: tmux attach -t jupyter; detach with Ctrl-b then d
 uv run jupyter lab --no-browser --ip 127.0.0.1 --port 8888
 ```
 
-```bash
-# on the Mac
-ssh -N -L 8888:127.0.0.1:8888 rtx
-```
+and reach it with an SSH tunnel: `ssh -N -L 8888:127.0.0.1:8888 your-gpu-machine`, then open the URL Jupyter printed.
 
-Then open the `http://127.0.0.1:8888/lab?token=…` URL that Jupyter printed. Keeping Jupyter bound to `127.0.0.1` and tunnelling over SSH means it's never exposed, even on your tailnet.
+Every notebook also saves its results to `runs/`, so a finished run's numbers survive even if the live plot was lost.
+
+## Less GPU memory
+
+Each notebook's config is printed before training. Lowering `micro_batch` (completions per forward pass) reduces peak memory without changing the algorithm; lowering `max_new_tokens` or `prompts_per_step` also helps, but changes the experiment. These settings have only been sized for 24 GB.
